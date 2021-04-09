@@ -18,20 +18,20 @@ import (
 )
 
 const tmpl = `
-{{define "dependencies"}}
-{{range .}}import * as {{.ModuleIdentifier}} from "{{.SourceFile}}"
-{{end}}{{end}}
+{{- define "dependencies"}}{{range removeWellKnownTypes .}}
+import * as {{.ModuleIdentifier}} from "{{.SourceFile}}"{{end}}
+{{end}}
 
-{{define "enums"}}
-{{range .}}export enum {{.Name}} {
+{{define "enums"}}{{range .}}
+export enum {{.Name}} {
 {{- range .Values}}
   {{.}} = "{{.}}",
 {{- end}}
 }
-
 {{end}}{{end}}
 
-{{define "messages"}}{{range .}}
+{{define "messages"}}
+{{range .}}
 {{- if .HasOneOfFields}}
 type Base{{.Name}} = {
 {{- range .NonOneOfFields}}
@@ -431,7 +431,10 @@ func tsType(r *registry.Registry, fieldType data.Type) string {
 	} else if !info.IsExternal {
 		typeStr = typeInfo.PackageIdentifier
 	} else {
-		typeStr = data.GetModuleName(typeInfo.Package, typeInfo.File) + "." + typeInfo.PackageIdentifier
+		typeStr = mapWellKnownType(info.Type)
+		if typeStr == "" {
+			typeStr = data.GetModuleName(typeInfo.Package, typeInfo.File) + "." + typeInfo.PackageIdentifier
+		}
 	}
 
 	if info.IsRepeated {
@@ -453,5 +456,16 @@ func mapScalaType(protoType string) string {
 	}
 
 	return ""
+}
 
+func mapWellKnownType(wellKnownType string) string {
+	switch wellKnownType {
+	case ".google.protobuf.Any":
+		return "any"
+	case ".google.protobuf.Empty":
+		return "Record<never, never>"
+	case ".google.protobuf.Timestamp":
+		return "Date"
+	}
+	return ""
 }
