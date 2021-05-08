@@ -1,17 +1,17 @@
-{{define "dependencies"}}
-{{range .}}import * as {{.ModuleIdentifier}} from "{{.SourceFile}}"
-{{end}}{{end}}
+{{- define "dependencies"}}{{range removeWellKnownTypes .}}
+import * as {{.ModuleIdentifier}} from "{{.SourceFile}}"{{end}}
+{{end}}
 
-{{define "enums"}}
-{{range .}}export enum {{.Name}} {
+{{define "enums"}}{{range .}}
+export enum {{.Name}} {
 {{- range .Values}}
 {{.}} = "{{.}}",
 {{- end}}
 }
-
 {{end}}{{end}}
 
-{{define "messages"}}{{range .}}
+{{define "messages"}}
+{{range .}}
 {{- if .HasOneOfFields}}
 type Base{{.Name}} = {
 {{- range .NonOneOfFields}}

@@ -18,8 +18,73 @@ import (
 	"github.com/nolotz/protoc-gen-grpc-gateway-ts/registry"
 )
 
-//go:embed tmpl.ts.tmpl
-var tmpl string
+const tmpl = `
+{{define "dependencies"}}
+{{range .}}import * as {{.ModuleIdentifier}} from "{{.SourceFile}}"
+{{end}}{{end}}
+
+{{define "enums"}}
+{{range .}}export enum {{.Name}} {
+{{- range .Values}}
+  {{.}} = "{{.}}",
+{{- end}}
+}
+
+{{end}}{{end}}
+
+{{define "messages"}}{{range .}}
+{{- if .HasOneOfFields}}
+type Base{{.Name}} = {
+{{- range .NonOneOfFields}}
+  {{fieldName .Name}}?: {{tsType .}}
+{{- end}}
+}
+
+export type {{.Name}} = Base{{.Name}}
+{{range $groupId, $fields := .OneOfFieldsGroups}}  & OneOf<{ {{range $index, $field := $fields}}{{fieldName $field.Name}}: {{tsType $field}}{{if (lt (add $index 1) (len $fields))}}; {{end}}{{end}} }>
+{{end}}
+{{- else -}}
+export type {{.Name}} = {
+{{- range .Fields}}
+  {{fieldName .Name}}?: {{tsType .}}
+{{- end}}
+}
+{{end}}
+{{end}}{{end}}
+
+{{define "services"}}{{range .}}export class {{.Name}} {
+{{- range .Methods}}  
+{{- if .ServerStreaming }}
+  static {{.Name}}(req: {{tsType .Input}}, entityNotifier?: fm.NotifyStreamEntityArrival<{{tsType .Output}}>, initReq?: fm.InitReq): Promise<void> {
+    return fm.fetchStreamingRequest<{{tsType .Input}}, {{tsType .Output}}>(` + "`{{renderURL .}}`" + `, entityNotifier, {...initReq, {{buildInitReq .}}})
+  }
+{{- else }}
+  static {{.Name}}(req: {{tsType .Input}}, initReq?: fm.InitReq): Promise<{{tsType .Output}}> {
+    return fm.fetchReq<{{tsType .Input}}, {{tsType .Output}}>(` + "`{{renderURL .}}`" + `, {...initReq, {{buildInitReq .}}})
+  }
+{{- end}}
+{{- end}}
+}
+{{end}}{{end}}
+
+/*
+* This file is a generated Typescript file for GRPC Gateway, DO NOT MODIFY
+*/
+{{if .Dependencies}}{{- include "dependencies" .StableDependencies -}}{{end}}
+{{- if .NeedsOneOfSupport}}
+type Absent<T, K extends keyof T> = { [k in Exclude<keyof T, K>]?: undefined };
+type OneOf<T> =
+  | { [k in keyof T]?: undefined }
+  | (
+    keyof T extends infer K ?
+      (K extends string & keyof T ? { [k in K]: T[K] } & Absent<T, K>
+        : never)
+    : never);
+{{end}}
+{{- if .Enums}}{{include "enums" .Enums}}{{end}}
+{{- if .Messages}}{{include "messages" .Messages}}{{end}}
+{{- if .Services}}{{include "services" .Services}}{{end}}
+`
 
 //go:embed fetch.ts.tmpl
 var fetchTmpl string
@@ -140,7 +205,10 @@ func tsType(r *registry.Registry, fieldType data.Type) string {
 	} else if !info.IsExternal {
 		typeStr = typeInfo.PackageIdentifier
 	} else {
-		typeStr = data.GetModuleName(typeInfo.Package, typeInfo.File) + "." + typeInfo.PackageIdentifier
+		typeStr = mapWellKnownType(info.Type)
+		if typeStr == "" {
+			typeStr = data.GetModuleName(typeInfo.Package, typeInfo.File) + "." + typeInfo.PackageIdentifier
+		}
 	}
 
 	if info.IsRepeated {
@@ -162,5 +230,16 @@ func mapScalaType(protoType string) string {
 	}
 
 	return ""
+}
 
+func mapWellKnownType(wellKnownType string) string {
+	switch wellKnownType {
+	case ".google.protobuf.Any":
+		return "any"
+	case ".google.protobuf.Empty":
+		return "Record<never, never>"
+	case ".google.protobuf.Timestamp":
+		return "Date"
+	}
+	return ""
 }
