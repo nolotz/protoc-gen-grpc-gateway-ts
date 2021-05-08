@@ -1,6 +1,6 @@
 module github.com/nolotz/protoc-gen-grpc-gateway-ts
 
-go 1.14
+go 1.16
 
 require (
 	github.com/Masterminds/goutils v1.1.1 // indirect
