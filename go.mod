@@ -1,4 +1,4 @@
-module github.com/atreya2011/protoc-gen-grpc-gateway-ts
+module github.com/nolotz/protoc-gen-grpc-gateway-ts
 
 go 1.14
 

@@ -9,7 +9,7 @@ import (
 	log "github.com/sirupsen/logrus" // nolint: depguard
 	"google.golang.org/protobuf/proto"
 
-	"github.com/atreya2011/protoc-gen-grpc-gateway-ts/generator"
+	"github.com/nolotz/protoc-gen-grpc-gateway-ts/generator"
 	"github.com/pkg/errors"
 )
 
