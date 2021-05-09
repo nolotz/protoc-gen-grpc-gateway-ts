@@ -376,9 +376,8 @@ func (r *Registry) collectExternalDependenciesFromData(filesData map[string]*dat
 					}
 				}
 				dependencies[identifier] = &data.Dependency{
-					ModuleIdentifier:       data.GetModuleName(typeInfo.Package, typeInfo.File),
-					SourceFile:             sourceFile,
-					FullyQualifiedTypeName: typeInfo.FullyQualifiedName,
+					ModuleIdentifier: data.GetModuleName(typeInfo.Package, typeInfo.File),
+					SourceFile:       sourceFile,
 				}
 			}
 		}
