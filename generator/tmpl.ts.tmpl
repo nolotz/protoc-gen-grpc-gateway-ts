@@ -35,11 +35,11 @@ export type {{.Name}} = {
 {{- range .Methods}}
 {{- if .ServerStreaming }}
 static {{.Name}}(req: {{tsType .Input}}, entityNotifier?: fm.NotifyStreamEntityArrival<{{tsType .Output}}>, initReq?: fm.InitReq): Promise<void> {
-return fm.fetchStreamingRequest<{{tsType .Input}}, {{tsType .Output}}>(` + "`{{renderURL .}}`" + `, entityNotifier, {...initReq, {{buildInitReq .}}})
+return fm.fetchStreamingRequest<{{tsType .Input}}, {{tsType .Output}}>(`{{renderURL .}}`, entityNotifier, {...initReq, {{buildInitReq .}}})
 }
 {{- else }}
 static {{.Name}}(req: {{tsType .Input}}, initReq?: fm.InitReq): Promise<{{tsType .Output}}> {
-return fm.fetchReq<{{tsType .Input}}, {{tsType .Output}}>(` + "`{{renderURL .}}`" + `, {...initReq, {{buildInitReq .}}})
+return fm.fetchReq<{{tsType .Input}}, {{tsType .Output}}>(`{{renderURL .}}`, {...initReq, {{buildInitReq .}}})
 }
 {{- end}}
 {{- end}}

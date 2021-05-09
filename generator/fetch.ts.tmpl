@@ -1,20 +1,19 @@
 {{/* gotype: entgo.io/ent/entc/gen.Graph */}}
-import { HttpClient } from '@angular/common/http';
 
 /*
  * This file is a generated Typescript file for GRPC Gateway, DO NOT MODIFY
  */
 
 export interface InitReq extends RequestInit {
-pathPrefix?: string
+    pathPrefix?: string
 }
 
 export function fetchReq<I, O>(path: string, init?: InitReq): Promise<O> {
-const {pathPrefix, ...req} = init || {}
+    const {pathPrefix, ...req} = init || {}
 
-const url = pathPrefix ? ` + "`${pathPrefix}${path}`" + `: path
+    const url = pathPrefix ? `${pathPrefix}${path}` : path
 
-return fetch(url, req).then(r = > r.json()) as Promise<O>
+    return fetch(url, req).then(r = > r.json()) as Promise<O>
 }
 
 // NotifyStreamEntityArrival is a callback that will be called on streaming entity arrival
@@ -26,33 +25,33 @@ export type NotifyStreamEntityArrival<T> = (resp: T) = > void
  * all entities will be returned as an array after the call finishes.
  **/
 export async function fetchStreamingRequest<S, R>(path: string, callback?: NotifyStreamEntityArrival<R>, init?: InitReq) {
-const {pathPrefix, ...req} = init || {}
-const url = pathPrefix ?` + "`${pathPrefix}${path}`" + `: path
-const result = await fetch(url, req)
-// needs to use the .ok to check the status of HTTP status code
-// http other than 200 will not throw an error, instead the .ok will become false.
-// see https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch#
-if (!result.ok) {
-const resp = await result.json()
-const errMsg = resp.error && resp.error.message ? resp.error.message: ""
-throw new Error(errMsg)
-}
+    const {pathPrefix, ...req} = init || {}
+    const url = pathPrefix ? `${pathPrefix}${path}`: path
+    const result = await fetch(url, req)
+    // needs to use the .ok to check the status of HTTP status code
+    // http other than 200 will not throw an error, instead the .ok will become false.
+    // see https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch#
+    if (!result.ok) {
+        const resp = await result.json()
+        const errMsg = resp.error && resp.error.message ? resp.error.message : ""
+        throw new Error(errMsg)
+    }
 
-if (!result.body) {
-throw new Error("response doesnt have a body")
-}
+    if (!result.body) {
+        throw new Error("response doesnt have a body")
+    }
 
-await result.body
-.pipeThrough(new TextDecoderStream())
-.pipeThrough<R>(getNewLineDelimitedJSONDecodingStream<R>())
-.pipeTo(getNotifyEntityArrivalSink((e: R) => {
-if (callback) {
-callback(e)
-}
-}))
+    await result.body
+    .pipeThrough(new TextDecoderStream())
+    .pipeThrough<R>(getNewLineDelimitedJSONDecodingStream<R>())
+    .pipeTo(getNotifyEntityArrivalSink((e: R) => {
+        if (callback) {
+            callback(e)
+        }
+    }))
 
-// wait for the streaming to finish and return the success respond
-return
+    // wait for the streaming to finish and return the success respond
+    return
 }
 
 /**
@@ -60,9 +59,9 @@ return
  * new line delimited json content stream into entities and able to push the entity to the down stream
  */
 interface JSONStringStreamController<T> extends TransformStreamDefaultController {
-buf?: string
-pos?: number
-enqueue: (s: T) = > void
+    buf?: string
+    pos?: number
+    enqueue: (s: T) => void
 }
 
 /**
@@ -125,7 +124,7 @@ type FlattenedRequestPayload = Record<string, Primitive | Array<Primitive>>;
  */
 function isPlainObject(value: unknown): boolean {
 const isObject =
-Object.prototype.toString.call(value).slice(8, -1) == = "Object";
+Object.prototype.toString.call(value).slice(8, -1) === "Object";
 const isObjLike = value !== null && isObject;
 
 if (!isObjLike || !isObject) {
@@ -135,8 +134,8 @@ return false;
 const proto = Object.getPrototypeOf(value);
 
 const hasObjectConstructor =
-typeof proto == = "object" &&
-proto.constructor == = Object.prototype.constructor;
+typeof proto === "object" &&
+proto.constructor === Object.prototype.constructor;
 
 return hasObjectConstructor;
 }
@@ -147,7 +146,7 @@ return hasObjectConstructor;
  * @return {boolean}
  */
 function isPrimitive(value: unknown): boolean {
-return ["string", "number", "boolean"].some(t = > typeof value == = t);
+return ["string", "number", "boolean"].some(t => typeof value === t);
 }
 
 /**
@@ -156,7 +155,7 @@ return ["string", "number", "boolean"].some(t = > typeof value == = t);
  * @return {boolean}
  */
 function isZeroValuePrimitive(value: Primitive): boolean {
-return value == = false || value == = 0 || value == = "";
+return value === false || value === 0 || value === "";
 }
 
 /**
@@ -216,11 +215,11 @@ const urlSearchParams = Object.keys(flattenedRequestPayload).reduce(
 (acc: string[][], key: string): string[][] => {
 // key should not be present in the url path as a parameter
 const value = flattenedRequestPayload[key];
-if (urlPathParams.find(f = > f == = key)) {
+if (urlPathParams.find(f = > f === key)) {
 return acc;
 }
 return Array.isArray(value)
-? [...acc, ...value.map(m = > [key, m.toString()])]: (acc = [...acc, [key, value.toString()]]);
+? [...acc, ...value.map(m => [key, m.toString()])]: (acc = [...acc, [key, value.toString()]]);
 },
 [] as string[][]
 );
