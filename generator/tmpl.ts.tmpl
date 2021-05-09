@@ -69,7 +69,7 @@ keyof T extends infer K ?
 {{- range .Methods}}
 export const {{ $serviceName }}{{ .Name }} = {
 	url: `{{renderURL .}}`,
-	method: ''
+	method: '{{ .HTTPMethod }}'
 };
 {{- end}}
 {{end}}

@@ -13,11 +13,11 @@ export function fetchReq<I, O>(path: string, init?: InitReq): Promise<O> {
 
     const url = pathPrefix ? `${pathPrefix}${path}` : path
 
-    return fetch(url, req).then(r = > r.json()) as Promise<O>
+    return fetch(url, req).then(r => r.json()) as Promise<O>
 }
 
 // NotifyStreamEntityArrival is a callback that will be called on streaming entity arrival
-export type NotifyStreamEntityArrival<T> = (resp: T) = > void
+export type NotifyStreamEntityArrival<T> = (resp: T) => void
 
 /**
  * fetchStreamingRequest is able to handle grpc-gateway server side streaming call
@@ -75,15 +75,15 @@ controller.pos = 0
 },
 
 transform(chunk: string, controller: JSONStringStreamController<T>) {
-if (controller.buf == = undefined) {
+if (controller.buf === undefined) {
 controller.buf = ''
 }
-if (controller.pos == = undefined) {
+if (controller.pos === undefined) {
 controller.pos = 0
 }
 controller.buf += chunk
 while (controller.pos < controller.buf.length) {
-if (controller.buf[controller.pos] == = '\n') {
+if (controller.buf[controller.pos] === '\n') {
 const line = controller.buf.substring(0, controller.pos)
 const response = JSON.parse(line)
 controller.enqueue(response.result)
@@ -171,13 +171,13 @@ requestPayload: T,
 path: string = ""
 ): FlattenedRequestPayload {
 return Object.keys(requestPayload).reduce(
-(acc: T, key: string): T = > {
+(acc: T, key: string): T => {
 const value = requestPayload[key];
 const newPath = path ? [path, key].join("."): key;
 
 const isNonEmptyPrimitiveArray =
 Array.isArray(value) &&
-value.every(v = > isPrimitive(v)) &&
+value.every(v => isPrimitive(v)) &&
 value.length > 0;
 
 const isNonZeroValuePrimitive =
@@ -214,10 +214,10 @@ const flattenedRequestPayload = flattenRequestPayload(requestPayload);
 const urlSearchParams = Object.keys(flattenedRequestPayload).reduce(
 (acc: string[][], key: string): string[][] => {
 // key should not be present in the url path as a parameter
-const value = flattenedRequestPayload[key];
-if (urlPathParams.find(f = > f === key)) {
-return acc;
-}
+    const value = flattenedRequestPayload[key];
+    if (urlPathParams.find(f => f === key)) {
+    return acc;
+    }
 return Array.isArray(value)
 ? [...acc, ...value.map(m => [key, m.toString()])]: (acc = [...acc, [key, value.toString()]]);
 },

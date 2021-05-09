@@ -103,7 +103,6 @@ func buildInitReq(method data.Method) string {
 	}
 
 	return strings.Join(fields, ", ")
-
 }
 
 // GetFetchModuleTemplate returns the go template for fetch module
