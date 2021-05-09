@@ -64,9 +64,12 @@ keyof T extends infer K ?
 {{- if .Messages}}{{include "messages" .Messages}}{{end}}
 {{- if .Services}}{{include "services" .Services}}{{end}}
 
-{{range .}}
+{{range .Services}}
 {{ $serviceName := .Name }}
 {{- range .Methods}}
-export const {{ $serviceName }}{{ .Name }} = `{{renderURL .}}`;
+export const {{ $serviceName }}{{ .Name }} = {
+	url: `{{renderURL .}}`,
+	method: ''
+};
 {{- end}}
 {{end}}
