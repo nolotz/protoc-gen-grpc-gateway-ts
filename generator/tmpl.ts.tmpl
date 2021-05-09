@@ -70,8 +70,8 @@ keyof T extends infer K ?
 export const {{ $serviceName }}{{ .Name }} = {
 	url: (req: {{tsType .Input}}): string => `{{renderURL .}}`,
 	method: '{{ .HTTPMethod }}',
-	mapRequest(data: any): {{tsType .Input}} => data,
-	mapResponse(data: any): {{tsType .Output}} => data
+	mapRequest: (data: any): {{tsType .Input}} => data,
+	mapResponse: (data: any): {{tsType .Output}} => data
 };
 {{- end}}
 {{end}}
