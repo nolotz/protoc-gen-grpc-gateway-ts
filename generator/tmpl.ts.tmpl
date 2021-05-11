@@ -67,11 +67,18 @@ keyof T extends infer K ?
 {{range .Services}}
 {{ $serviceName := .Name }}
 {{- range .Methods}}
-export const {{ $serviceName }}{{ .Name }} = {
+export const {{ $serviceName }}{{ .Name }}Endpoint = {
 	url: (req: {{tsType .Input}}): string => `{{renderURL .}}`,
-	method: '{{ .HTTPMethod }}',
-	mapRequest: (data: any): {{tsType .Input}} => data,
-	mapResponse: (data: any): {{tsType .Output}} => data
+	method: '{{ .HTTPMethod }}'
 };
 {{- end}}
+{{end}}
+
+{{range .Services}}
+	{{ $serviceName := .Name }}
+	export interface {{ $serviceName }}Service {
+		{{- range .Methods}}
+		{{ fieldName .Name }}(request: {{ tsType .Output }}): {{ tsType .Output }};
+		{{- end}}
+	}
 {{end}}
