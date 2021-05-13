@@ -49,6 +49,7 @@ return fm.fetchReq<{{tsType .Input}}, {{tsType .Output}}>(`{{renderURL .}}`, {..
 /*
  * This file is a generated Typescript file for GRPC Gateway, DO NOT MODIFY
  */
+import {Observable} from "rxjs";
 {{if .Dependencies}}{{- include "dependencies" .StableDependencies -}}{{end}}
 {{- if .NeedsOneOfSupport}}
 type Absent<T, K extends keyof T> = { [k in Exclude<keyof T, K>]?: undefined };
