@@ -75,10 +75,10 @@ export const {{ $serviceName }}{{ .Name }}Endpoint = {
 {{end}}
 
 {{range .Services}}
-	{{ $serviceName := .Name }}
-	export interface {{ $serviceName }}Service {
-		{{- range .Methods}}
-		{{ fieldName .Name }}(request: {{ tsType .Output }}): {{ tsType .Output }};
-		{{- end}}
-	}
+{{ $serviceName := .Name }}
+export interface {{ $serviceName }}DataService {
+	{{- range .Methods}}
+	{{ fieldName .Name }}(request: {{ tsType .Input }}): Observable<{{ tsType .Output }}>;
+	{{- end}}
+}
 {{end}}
